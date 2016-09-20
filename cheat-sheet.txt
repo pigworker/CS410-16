@@ -13,6 +13,7 @@ hole   = place where an expression is expected.
 Emacs:
 ------
 C-x C-f   : find a file to load
+C-x C-s   : Save buffer
 C-x C-c   : Exit emacs
 
 C-s       : Search forward for some text
