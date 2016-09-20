@@ -18,3 +18,7 @@ This class is 100% by coursework, based on five hand-ins with oral and written f
   3. Friday    18 November
   4. Wednesday 11 January
   5. as late in May as we can get away with and still return a final mark to the exam board (to be announced)
+
+## Getting Started with Agda
+
+This repo contains an instruction file (install.txt) explaining our current best guess at how to get the version of Agda we'll be using up and running on a departmental machine.
