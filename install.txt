@@ -28,6 +28,10 @@ installed on it: https://www.haskell.org/
   agda-mode setup
                          # configures emacs to work with Agda
 
+2.1 Cabal installs can also be done in one line:
+
+  cabal install alex happy agda-2.5.1.1
+
 3. Start emacs, loading an Agda file, e.g., cd to the repo and
 
   emacs Hello.agda
