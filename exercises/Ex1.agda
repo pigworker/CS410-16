@@ -584,7 +584,7 @@ testTake2 = refl
 
 
 ----------------------------------------------------------------------------
--- 1.13 Properties of N>= (to be proven by induction)          (score ? / 3)
+-- ??? 1.13 Properties of N>= (to be proven by induction)     (score: ? / 3)
 ----------------------------------------------------------------------------
 
 N>=reflexive : (n : Nat) ->  n N>= n
