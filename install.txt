@@ -19,8 +19,11 @@ installed on it: https://www.haskell.org/
   cabal install happy
                          # installs Haskell's parser-generator
 
-  cabal install agda
+  cabal install agda-2.5.1.1
                          # installs Agda herself
+			 # version 2.5.1.1 is the one we need
+			 # (latest at time of writing, but use
+			 # this version even if things change)
 
   agda-mode setup
                          # configures emacs to work with Agda
