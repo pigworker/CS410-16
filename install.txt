@@ -1,0 +1,35 @@
+How to install Agda on a departmental machine (we hope)
+=======================================================
+
+A similar procedure may work on any machine which already has a
+sufficiently recent version of the Glasgow Haskell Compiler
+installed on it: https://www.haskell.org/
+
+1. Ensure that your machine is running Linux.
+
+2. In a terminal window, issue the following commands:
+
+  cabal update
+                         # ensures Haskell's package manager
+			 # is up to date
+
+  cabal install alex
+                         # installs Haskell's lexer-generator
+
+  cabal install happy
+                         # installs Haskell's parser-generator
+
+  cabal install agda
+                         # installs Agda herself
+
+  agda-mode setup
+                         # configures emacs to work with Agda
+
+3. Start emacs, loading an Agda file, e.g., cd to the repo and
+
+  emacs Hello.agda
+
+4. Explore!
+
+(Stuart has helpfully written an emacs and Agda cheat-sheet.txt file
+which you can find in the repo.)
