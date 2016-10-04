@@ -33,10 +33,10 @@ comm : forall {S T} -> S + T -> T + S
 comm (inl x) = inr x
 comm (inr x) = inl x
 
-
+{-
 howMany : Three + Five
 howMany = {!-l!}
-
+-}
 {-
 brexit : forall {X : Set} -> X
 brexit = brexit
@@ -46,17 +46,61 @@ brexit = brexit
 
 -- falsity
 
+data Zero : Set where
+
 -- negation
+
+Not : Set -> Set
+Not X = X -> Zero
+
+magic : forall {X : Set} -> Zero ->  X
+magic ()
+
 
 -- triviality
 
+record One : Set where
+  constructor <>
+
+foo : One
+foo = <>
+
+
 -- natural numbers
+
+data Nat : Set where
+  zero : Nat
+  suc : Nat -> Nat
+{-# BUILTIN NATURAL Nat #-}
+
+five : Nat
+five = 5
 
 -- <=
 
+_<=_ : Nat -> Nat -> Set
+zero <= y = One
+suc x <= zero = Zero
+suc x <= suc y = x <= y
+
+ex1 : 4 <= 17
+ex1 = <>
+
+ex2 : Not (17 <= 4)
+ex2 ()
+
 -- reflexivity
 
+refl<= : (n : Nat) -> n <= n
+refl<= zero = <>
+refl<= (suc n) = refl<= n
+
 -- totality
+
+total<= : (m n : Nat) -> (m <= n) + (n <= m)
+total<= zero n = inl <>
+total<= (suc x) zero = inr <>
+total<= (suc x) (suc x₁) = total<= x x₁
 
 -- transitivity
 
