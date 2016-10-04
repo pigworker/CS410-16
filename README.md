@@ -22,3 +22,5 @@ This class is 100% by coursework, based on five hand-ins with oral and written f
 ## Getting Started with Agda
 
 This repo contains an instruction file (install.txt) explaining our current best guess at how to get the version of Agda we'll be using up and running on a departmental machine.
+
+Full documentation for Agda can be found here: http://agda.readthedocs.io/en/latest/

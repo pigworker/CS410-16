@@ -5,7 +5,6 @@ Agda / Emacs Cheat Sheet
 This document will give you an overview of commonly used Agda, as well as Emacs, commands.
 
 C-     = Ctrl
-S-     = Shift
 M-     = Alt/Esc
 buffer = file
 hole   = place where an expression is expected.
@@ -13,17 +12,18 @@ hole   = place where an expression is expected.
 Emacs:
 ------
 C-x C-f   : find a file to load
+C-x C-s   : Save buffer
 C-x C-c   : Exit emacs
 
 C-s       : Search forward for some text
 C-r       : Search backward for some text
 C-/       : Undo
-S-<       : Jump to top of the buffer
-S->       : Jump to end of the buffer
-S-}       : Jump forwards a paragraph (blank line after block of text)
-S-{       : Jump backwards a paragraph
 C-a       : Jump to start of the line
 C-e       : Jump to end of the line
+M-<       : Jump to top of the buffer
+M->       : Jump to end of the buffer
+M-}       : Jump forwards a paragraph (blank line after block of text)
+M-{       : Jump backwards a paragraph
 
 Agda:
 -----
