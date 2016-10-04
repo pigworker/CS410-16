@@ -24,6 +24,7 @@ data Code : Nat -> Nat -> Set where
   PUSH : forall {n} -> Nat -> Code n (suc n)
   ADD : forall {n} -> Code (suc (suc n)) (suc n)
   _/_ : forall {l m n} -> Code l m -> Code m n -> Code l n
+  SKIP : forall {n} -> Code n n
 
 data Stk : Nat -> Set where
   S0 : Stk zero
@@ -32,10 +33,17 @@ data Stk : Nat -> Set where
 top : forall {n} -> Stk (suc n) -> Nat
 top (s <: x) = x
 
-run : forall {m n} -> Stk m -> Code m n -> Stk n
-run s (PUSH x) = s <: x
-run ((s <: x) <: y) ADD = s <: (x +N y)
-run s (c / d) = run (run s c) d
+id : forall {X : Set} -> X -> X
+id = \ x -> x
+
+_o_ : forall {X Y Z : Set} -> (Y -> Z) -> (X -> Y) -> (X -> Z)
+f o g = \ z -> f (g z)
+
+run : forall {m n} -> Code m n -> Stk m ->  Stk n
+run (PUSH x) s = s <: x
+run ADD  ((s <: x) <: y) = s <: (x +N y)
+run (c / d) = run d o run c
+run SKIP = id
 
 comp : H -> forall {n} -> Code n (suc n)
 comp (val x) = PUSH x

@@ -23,17 +23,54 @@ data Two : Set where tt ff : Two
 
 data H : Set where
   val : Nat -> H
+  boo : Two -> H
   add : H -> H -> H
+  ifte : H -> H -> H -> H  
 
+{-
 -- chuck in some Boolean things
 
 -- what happens to the evaluator?
 
+Val : Set
+Val = Nat + Two
+-}
+{-
 eval : H -> Nat
 eval (val x) = x
 eval (add h k) = eval h +N eval k
+-}
+{-
+eval : H -> Val
+eval (val x) = inl x
+eval (boo x) = inr x
+eval (add d e) with eval d | eval e
+eval (add d e) | inl x | inl y = inl (x +N y)
+eval (add d e) | inl x | inr y = {!!}  -- eek!
+eval (add d e) | inr x | z = {!!} -- = inl ({!eval d!} +N {!!})
+eval (ifte b t e) = {!!}
+-}
 
 -- typed expressions, please
+data Ty : Set where nat bool : Ty
+
+data TH : Ty -> Set where
+  val : Nat -> TH nat
+  boo : Two -> TH bool
+  add : TH nat -> TH nat -> TH nat
+  ifte : forall {t} -> TH bool -> TH t -> TH t -> TH t  
+
+Val : Ty -> Set
+Val nat  = Nat
+Val bool = Two
+
+eval : forall {t} -> TH t -> Val t
+eval (val x) = x
+eval (boo x) = {!x!}
+eval (add d e) = eval d +N eval e
+eval (ifte b t e) with eval b
+eval (ifte b t e) | tt = eval t
+eval (ifte b t e) | ff = eval e
 
 -- what happens to stack height ?
 data Code : Nat -> Nat -> Set where

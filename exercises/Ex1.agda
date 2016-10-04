@@ -96,7 +96,7 @@ Not : Set -> Set
 Not X = X -> Zero
 
 deMorgan1 : {A B : Set} -> (Not A + Not B) -> Not (A * B)
-deMorgan1 x y = {!!}
+deMorgan1 x = {!!}
 
 deMorgan2 : {A B : Set} -> Not (A * B) -> (Not A + Not B)
 deMorgan2 x = {!!}
