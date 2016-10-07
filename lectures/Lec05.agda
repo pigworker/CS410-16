@@ -66,11 +66,42 @@ Val bool = Two
 
 eval : forall {t} -> TH t -> Val t
 eval (val x) = x
-eval (boo x) = {!x!}
+eval (boo x) = x
 eval (add d e) = eval d +N eval e
 eval (ifte b t e) with eval b
 eval (ifte b t e) | tt = eval t
 eval (ifte b t e) | ff = eval e
+
+untype : forall {t} -> TH t -> H
+untype (val x) = val x
+untype (boo x) = boo x
+untype (add d e) = add (untype d) (untype e)
+untype (ifte b t e) = ifte (untype b) (untype t) (untype e)
+
+data Check (t : Ty) : H -> Set where
+  typed : (h : TH t) -> Check t (untype h)
+  error : (h : H) -> Check t h
+
+check : (t : Ty)(h : H) -> Check t h
+check nat (val x) = typed (val x)
+check bool (val x) = error (val x)
+check nat (boo x) = error (boo x)
+check bool (boo x) = typed (boo x)
+check nat (add d' e')                with check nat d' | check nat e'
+check nat (add .(untype d) .(untype e)) | typed d | typed e = typed (add d e)
+check nat (add .(untype h) e')          | typed h | error .e' = error (add (untype h) e')
+check nat (add d' .(untype h))          | error .d' | typed h = error (add d' (untype h))
+check nat (add d' e')                   | error .d' | error .e' = error (add d' e')
+check bool (add d' e') = error (add d' e')
+check t (ifte b' d' e') with check bool b' | check t d' | check t e'
+check t (ifte .(untype b) .(untype d) .(untype e)) | typed b | typed d | typed e
+  = typed (ifte b d e)
+check t (ifte .(untype b) .(untype d) e') | typed b | typed d | error .e'
+  = error (ifte (untype b) (untype d) e')
+check t (ifte .(untype h) d' e') | typed h | error .d' | z
+  = error (ifte (untype h) d' e')
+check t (ifte b' d' e') | error .b' | y | z
+  = error (ifte b' d' e')
 
 -- what happens to stack height ?
 data Code : Nat -> Nat -> Set where
