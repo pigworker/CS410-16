@@ -78,30 +78,61 @@ untype (boo x) = boo x
 untype (add d e) = add (untype d) (untype e)
 untype (ifte b t e) = ifte (untype b) (untype t) (untype e)
 
+record One : Set where
+  constructor <>
+
+data H' : Set where
+  addL : One -> H -> H'
+  addR : H -> One -> H'
+  ifteC : One -> H -> H -> H'  
+  ifteT : H -> One -> H -> H'  
+  ifteE : H -> H -> One -> H'  
+
+_>>>_ : H -> H' -> H
+h >>> addL <> h2 = add h h2
+h >>> addR h1 <> = add h1 h
+h >>> ifteC <> h2 h3 = ifte h h2 h3
+h >>> ifteT h1 <> h3 = ifte h1 h h3
+h >>> ifteE h1 h2 <> = ifte h1 h2 h
+
+data List (X : Set) : Set where
+  []   : List X
+  _::_ : X -> List X -> List X
+
+_>>>>_ : H -> List H' -> H
+h >>>> [] = h
+h >>>> (h' :: h's) = (h >>>> h's) >>> h'
+
 data Check (t : Ty) : H -> Set where
   typed : (h : TH t) -> Check t (untype h)
-  error : (h : H) -> Check t h
+  error : (h : H)(h's : List H') -> Check t (h >>>> h's)
 
 check : (t : Ty)(h : H) -> Check t h
 check nat (val x) = typed (val x)
-check bool (val x) = error (val x)
-check nat (boo x) = error (boo x)
+check bool (val x) = error (val x) []
+check nat (boo x) = error (boo x) []
 check bool (boo x) = typed (boo x)
 check nat (add d' e')                with check nat d' | check nat e'
 check nat (add .(untype d) .(untype e)) | typed d | typed e = typed (add d e)
-check nat (add .(untype h) e')          | typed h | error .e' = error (add (untype h) e')
-check nat (add d' .(untype h))          | error .d' | typed h = error (add d' (untype h))
-check nat (add d' e')                   | error .d' | error .e' = error (add d' e')
-check bool (add d' e') = error (add d' e')
+check nat (add .(untype h) .(g >>>> g's))
+   | typed h | error g g's = error g (addR (untype h) <> :: g's)
+check nat (add .(g >>>> g's) .(untype h))          | error g g's | typed h = error g (addL <> (untype h) :: g's)
+check nat (add .(g >>>> g's) .(h >>>> h's))                   | error g g's | error h h's = error g (addL <> (h >>>> h's) :: g's)
+check bool (add d' e') = error (add d' e') []
 check t (ifte b' d' e') with check bool b' | check t d' | check t e'
 check t (ifte .(untype b) .(untype d) .(untype e)) | typed b | typed d | typed e
   = typed (ifte b d e)
-check t (ifte .(untype b) .(untype d) e') | typed b | typed d | error .e'
-  = error (ifte (untype b) (untype d) e')
-check t (ifte .(untype h) d' e') | typed h | error .d' | z
-  = error (ifte (untype h) d' e')
-check t (ifte b' d' e') | error .b' | y | z
-  = error (ifte b' d' e')
+check t (ifte .(untype b) .(untype d) .(g >>>> g's)) | typed b | typed d | error g g's
+  = error g (ifteE (untype b) (untype d) <> :: g's)
+check t (ifte .(untype h) .(g >>>> g's) e') | typed h | error g g's | z
+  = error g (ifteT (untype h) <> e' :: g's)
+check t (ifte .(g >>>> g's) d' e') | error g g's | y | z
+  = error g (ifteC <> d' e' :: g's)
+
+myTerm : H
+myTerm = ifte (ifte (boo tt) (boo ff) (boo tt))
+           (add (val 3) (boo ff)) (val 7)
+
 
 -- what happens to stack height ?
 data Code : Nat -> Nat -> Set where
