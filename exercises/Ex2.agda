@@ -208,3 +208,165 @@ matMult xmn xnp = {!!}
 ----------------------------------------------------------------------------
 -- ??? TO BE CONTINUED...
 ----------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------
+-- INDEXING INTO VECTORS
+----------------------------------------------------------------------------
+
+-- This family of "finite sets of a given size" is useful as types for
+-- indexing into vectors with no danger of bounds violation.
+
+
+data Fin : Nat -> Set where
+  fz : {n : Nat} -> Fin (suc n)
+  fs : {n : Nat} -> Fin n -> Fin (suc n)
+
+-- Failure-free projection.
+
+project : forall {n X} -> Vec X n -> (Fin n -> X)   -- gratuitous extra (..)
+-- project [] ()
+project (x :: xs) fz     = x
+project (x :: xs) (fs i) = project xs i
+
+-- do the gotcha, Conor -- oh, they fixed it
+
+-- here's a wee visualization of the smallest three Fin sets.
+
+-- Fin 0 |    Fin 1 |    Fin 2   |        Fin 3
+---------+----------+------------+----------------
+--       |    fz{0} |     fz{1}  |         fz{2}
+--       |          | fs (fz{0}) |     fs (fz{1})
+--       |          |            | fs (fs (fz{0}))
+
+
+----------------------------------------------------------------------------
+-- 2.12 tabulation                                            (score: ? / 2)
+----------------------------------------------------------------------------
+
+tabulate : forall {n X} -> (Fin n -> X) -> Vec X n
+tabulate {n} f = {!!}
+
+-- make sure that project (tabulate f) i == f i
+
+----------------------------------------------------------------------------
+-- THINNINGS (A CATEGORY)
+----------------------------------------------------------------------------
+
+-- A thinning is an order-preserving embedding between Fin types. E.g.
+
+--              fz  ---------------->  fz
+--           fs fz  -----,___          fs fz
+--      fs (fs fz)  ---,__   '------>  fs (fs fz)
+--                        '---,__      fs (fs (fs fz))
+--                               '-->  fs (fs (fs (fs fz)))
+
+-- We can represent them by this family of types:
+
+data Thinning : Nat -> Nat -> Set where
+  noThin :                                Thinning zero    zero
+  fzToFz : {m n : Nat} -> Thinning m n -> Thinning (suc m) (suc n)
+  skipFz : {m n : Nat} -> Thinning m n -> Thinning m       (suc n)
+
+thin : {m n : Nat} -> Thinning m n -> (Fin m -> Fin n)
+thin noThin ()
+thin (fzToFz t) fz     = fz
+thin (fzToFz t) (fs i) = fs (thin t i)
+thin (skipFz t) i      = fs (thin t i)
+
+myThinning : Thinning 3 5
+myThinning = fzToFz (skipFz (fzToFz (skipFz (fzToFz noThin))))
+
+
+----------------------------------------------------------------------------
+-- 2.13 category of thinnings                                 (score: ? / 5)
+----------------------------------------------------------------------------
+
+-- Construct the identity thinning and composition of thinnings, then
+-- show that the categorical laws hold.
+
+idThin : {n : Nat} -> Thinning n n
+idThin {n} = {!!}
+
+_-thn-_ : {l m n : Nat} -> Thinning l m -> Thinning m n -> Thinning l n
+s -thn- t = {!!}
+
+id-thn : {m n : Nat}(t : Thinning m n) -> (idThin -thn- t) == t
+id-thn t = {!!}
+
+thn-id : {m n : Nat}(t : Thinning m n) -> (t -thn- idThin) == t
+thn-id t = {!!}
+
+thn-assoc : {k l m n : Nat}
+            (r : Thinning k l)(s : Thinning l m)(t : Thinning m n) ->
+            ((r -thn- s) -thn- t) == (r -thn- (s -thn- t))
+thn-assoc r s t = {!!}
+
+-- By the way, (suc, fzToFz) should be a functor from (Nat, Thinning)
+-- to itself.
+
+
+----------------------------------------------------------------------------
+-- 2.14 functoriality of "thin"                               (score: ? / 2)
+----------------------------------------------------------------------------
+
+-- Show that (Fin, thin) is a functor from (Nat, Thinning) to (Set, ->).
+-- That is, complete the following.
+
+thinId : {n : Nat}(i : Fin n) -> thin idThin i == i
+thinId i = {!!}
+
+thinThn : {l m n : Nat}(s : Thinning l m)(t : Thinning m n)(i : Fin l) ->
+          thin t (thin s i) == thin (s -thn- t) i
+thinThn s t i = {!!}
+
+
+----------------------------------------------------------------------------
+-- 2.15 Vector "selection"                                    (score: ? / 1)
+----------------------------------------------------------------------------
+
+-- Give a function using a thinning to select from a vector just those
+-- elements in positions which the thinning targets.
+
+selection : forall {m n X} -> Thinning m n -> Vec X n -> Vec X m
+selection t xs = {!!}
+
+-- Your function should satisfy the property that
+--    proj (selection t xs) i == proj xs (thin t i)
+-- but there are no marks available for the proof.
+-- Similarly, there are no marks for thinking about
+-- whether selection is the arrow action of a functor.
+
