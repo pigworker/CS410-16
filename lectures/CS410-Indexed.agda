@@ -43,6 +43,8 @@ record MonadIx {W : Set}(F : (W -> Set) -> (W -> Set)) : Set1 where
   _?>=_ : forall {P Q w} ->
           F P w -> (forall {v} -> P v -> F Q v) -> F Q w
   fp ?>= k = extendIx k fp
+  _-Ix-_ : forall {P Q R} -> [ P -:> F Q ] -> [ Q -:> F R ] -> [ P -:> F R ]
+  pq -Ix- qr = extendIx qr o pq
 
 -- every MonadIx gives a FunctorIx
 
@@ -50,18 +52,31 @@ monadFunctorIx : forall {W}{F} -> MonadIx {W} F -> FunctorIx {W}{W} F
 monadFunctorIx M = record { mapIx = \ f -> extendIx (retIx o f) }
   where open MonadIx M
 
+module MONADIXLAWS {W : Set}{F : (W -> Set) -> (W -> Set)}(M : MonadIx F) where
+  open MonadIx M
+  record MonadIxLaws : Set1 where
+    field
+      lunit : forall {P Q}(f : [ P -:> F Q ]){i}(p : P i) ->
+              (retIx -Ix- f) p == f p
+      runit : forall {P Q}(f : [ P -:> F Q ]){i}(p : P i) ->
+              (f -Ix- retIx) p == f p
+      assoc : forall {P Q R S}(f : [ P -:> F Q ])(g : [ Q -:> F R ])(h : [ R -:> F S ])
+              {i}(p : P i) ->
+              ((f -Ix- g) -Ix- h) p == (f -Ix- (g -Ix- h)) p
+open MONADIXLAWS public
+
 -- indexed containers, also known as interaction strutures, give us
 -- functors
 
 record _=>_ (I J : Set) : Set1 where
   constructor _<!_/_
   field
-    Shape     : J -> Set
-    Position  : (j : J) -> Shape j -> Set
-    index     : (j : J)(s : Shape j) -> Position j s -> I
+    Command   : J -> Set
+    Response  : (j : J) -> Command j -> Set
+    next      : (j : J)(s : Command j) -> Response j s -> I
 
 IC : forall {I J} -> I => J -> (I -> Set) -> (J -> Set)
-IC {I}{J} C X j = Sg (Shape j) \ s -> (p : Position j s) -> X (index j s p)
+IC {I}{J} C X j = Sg (Command j) \ s -> (p : Response j s) -> X (next j s p)
   where open _=>_ C
 
 icFunctorIx : forall {I J}(C : I => J) -> FunctorIx (IC C)
