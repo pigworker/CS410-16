@@ -93,3 +93,52 @@ data Protocol : Set where
 
 Comms : Protocol => Protocol
 Comms = {!!} <! {!!} / {!!}
+
+-- ???
+-- 3.7 Given a protocol, show how to construct the "dual" protocol, in which the
+-- roles of send and recv have been swapped.
+
+dual : Protocol -> Protocol
+dual p = {!!}
+
+-- Signal *traffic* is a list of pairs of bits and characters,
+-- recording which data were exchanged
+
+Traffic = List ( Two   -- tt for "sent", ff for "received"
+               * Char  -- what was sent or received
+               )
+
+-- ???
+-- 3.8 Define a type which accurately represents the evidence that some
+-- traffic is valid for a given protocol.
+
+Valid : Protocol -> Traffic -> Set
+Valid p bcs = {!!}
+
+-- ???
+-- 3.9 Show that if traffic is valid for a protocol, flipping the bits in the
+-- traffic gives valid traffic for the dual protocol.
+
+mapList : forall {S T} -> (S -> T) -> List S -> List T
+mapList f []         = []
+mapList f (x :: xs)  = f x :: mapList f xs
+
+not : Two -> Two
+not tt = ff
+not ff = tt
+
+dualValid : (p : Protocol)(bcs : Traffic) ->
+            Valid p bcs -> Valid (dual p) (mapList (\ { (b , c) -> not b , c }) bcs)
+dualValid p bcs v = {!!}
+
+-- ???
+-- 3.10 Show that any two strategies for interacting according to a protocol and its
+-- dual, respectively, can be successfully coroutined to generate valid traffic for the
+-- protocol.
+
+communicate : (p : Protocol)
+              (me : IterIx Comms (_==_ stop) p)
+              (you : IterIx Comms (_==_ stop) (dual p)) ->
+              Sg Traffic \ bcs -> Valid p bcs
+communicate p me you = {!!}
+
