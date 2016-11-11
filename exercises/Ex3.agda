@@ -137,8 +137,8 @@ dualValid p bcs v = {!!}
 -- protocol.
 
 communicate : (p : Protocol)
-              (me : IterIx Comms (_==_ stop) p)
-              (you : IterIx Comms (_==_ stop) (dual p)) ->
+              (me  : FreeIx Comms (_==_ stop) p)
+              (you : FreeIx Comms (_==_ stop) (dual p)) ->
               Sg Traffic \ bcs -> Valid p bcs
 communicate p me you = {!!}
 
