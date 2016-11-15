@@ -67,12 +67,18 @@ module EVALSUB where
 -- ???
 -- 3.5 Show that for any interaction structure C : I => I,
 -- FreeIx C obeys the MonadIxLaws
--- HINT: you will need to make use of "ext".
+-- HINT: you will need to make use of "EXT".
 
 module FREEIXLAWS {I : Set}(C : I => I) where
   open MonadIx (freeMonadIx C)
+  
+  rhelp : forall {X}{i}(fcx : FreeIx C X i) ->
+          extendIx retIx fcx == fcx
+  rhelp (ret x) = refl
+  rhelp (do (c , k)) rewrite EXT (λ r → extendIx retIx (k r)) k (\ r -> rhelp (k r)) = refl
+
   freeMonadIxLaws : MonadIxLaws (freeMonadIx C)
-  freeMonadIxLaws = record { lunit = {!!} ; runit = {!!} ; assoc = {!!} }
+  freeMonadIxLaws = record { lunit = {!!} ; runit = \ f p -> rhelp (f p) ; assoc = {!!} }
 
 -- PROTOCOLS
 

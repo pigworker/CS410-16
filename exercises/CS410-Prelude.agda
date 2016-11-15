@@ -80,6 +80,10 @@ sym refl = refl
 postulate ext : forall {l m}{A : Set l}{B : Set m}{f g : A -> B} ->
             (forall a -> f a == g a) -> f == g
 
+postulate EXT : forall {l m}{A : Set l}{B : A -> Set m}
+                (f g : (a : A) -> B a) ->
+                (forall a -> f a == g a) -> f == g
+
 ----------------------------------------------------------------------------
 -- functional plumbing
 ----------------------------------------------------------------------------
