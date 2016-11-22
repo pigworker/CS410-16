@@ -95,7 +95,12 @@ data Protocol : Set where
 
 -- ???
 -- 3.6 Construct an interaction structure which describes how to perform one step
--- of a protocol.
+-- of a protocol. That is, the possible commands and responses should capture the
+-- information exchanged in just the first communication action that the protocol
+-- allows (does "stop" allow any communication actions?); the next function should
+-- compute what the rest of the protocol is. The idea is that FreeIx Comms should
+-- capture exactly the strategies for valid communications according to the
+-- protocol.
 
 Comms : Protocol => Protocol
 Comms = {!!} <! {!!} / {!!}
@@ -147,4 +152,74 @@ communicate : (p : Protocol)
               (you : FreeIx Comms (_==_ stop) (dual p)) ->
               Sg Traffic \ bcs -> Valid p bcs
 communicate p me you = {!!}
+
+
+-- ???
+-- 3.11 Implement an example protocol (for a binary arithmetic server)
+-- Here is the spec:
+--   Client sends a single decimal digit, n.
+--   Client sends a sequence of binary digits exactly 2^n bits long.
+--   Client sends either '+' or '-'.
+--   Client sends another sequence of binary digits exactly 2^n bits long.
+--   Server responds with a sequence of binary digits exactly 2^n bits long,
+--     which is the sum or difference (as indicated) of the other two.
+
+binaryClientProtocol : Protocol
+binaryClientProtocol = {!!}
+
+  -- you will need to implement a bunch of helpers to check validity, e.g.,
+
+isBit : Char -> Two
+isBit '0' = tt
+isBit '1' = tt
+isBit _   = ff
+
+  -- you will also need to interpret things which pass the check
+
+whichBit : (c : Char) -> So (isBit c) -> Two
+whichBit '0' p = ff
+whichBit '1' p = tt
+whichBit _ p = ff  -- frustratingly, a dummy is needed here
+                   -- but you still can't give a wrong bit
+
+  -- you might also want to use the following representation of bit sequences
+
+Word : Nat -> Set
+Word zero = Two
+Word (suc n) = Word n * Word n
+
+  -- here's an example of an arithmetic operation
+
+wordAddBit : (n : Nat) -> Word n -> Two -> Two * Word n
+wordAddBit zero tt tt = tt , ff
+wordAddBit zero tt ff = ff , tt
+wordAddBit zero ff tt = ff , tt
+wordAddBit zero ff ff = ff , ff
+wordAddBit (suc n) (hi , lo) b with wordAddBit n lo b
+wordAddBit (suc n) (hi , lo) b | c , lo' with wordAddBit n hi c
+wordAddBit (suc n) (hi , lo) b | c , lo' | d , hi' = d , hi' , lo'
+
+zeroWord : (n : Nat) -> Word n
+zeroWord zero = ff
+zeroWord (suc n) = zeroWord n , zeroWord n
+
+-- a really bad way to convert unary to binary
+
+nat2Word : (n : Nat) -> Nat -> Word n
+nat2Word n zero = zeroWord n
+nat2Word n (suc x) = snd (wordAddBit n (nat2Word n x) tt)
+
+example : Word 3
+example = nat2Word 3 10
+
+
+-- Now implement a client and server
+
+binaryClient : FreeIx Comms (_==_ stop) binaryClientProtocol
+binaryClient = {!!}
+
+binaryServer : FreeIx Comms (_==_ stop) (dual binaryClientProtocol)
+binaryServer = {!!}
+
+-- Make them communicate!
 
