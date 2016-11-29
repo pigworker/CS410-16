@@ -191,17 +191,16 @@ Word (suc n) = Word n * Word n
   -- here's an example of an arithmetic operation
 
 wordAddBit : (n : Nat) -> Word n -> Two -> Two * Word n
+wordAddBit n w ff = ff , w
 wordAddBit zero tt tt = tt , ff
-wordAddBit zero tt ff = ff , tt
 wordAddBit zero ff tt = ff , tt
-wordAddBit zero ff ff = ff , ff
 wordAddBit (suc n) (hi , lo) b with wordAddBit n lo b
 wordAddBit (suc n) (hi , lo) b | c , lo' with wordAddBit n hi c
 wordAddBit (suc n) (hi , lo) b | c , lo' | d , hi' = d , hi' , lo'
 
 zeroWord : (n : Nat) -> Word n
 zeroWord zero = ff
-zeroWord (suc n) = zeroWord n , zeroWord n
+zeroWord (suc n) = z , z where z = zeroWord n
 
 -- a really bad way to convert unary to binary
 
@@ -210,7 +209,7 @@ nat2Word n zero = zeroWord n
 nat2Word n (suc x) = snd (wordAddBit n (nat2Word n x) tt)
 
 example : Word 3
-example = nat2Word 3 10
+example = nat2Word 3 42
 
 
 -- Now implement a client and server
