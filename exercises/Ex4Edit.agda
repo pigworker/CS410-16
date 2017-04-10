@@ -202,10 +202,10 @@ main : IO One
 main = mainLoop initBuf (\ k b -> update (keystroke k b)) render
 
 {- To build the editor, just do
-     make Ex6Edit
+     make Ex4Edit
    in a shell window.
    To run the editor, once compiled, do
-     make edit
+     ./Ex4Edit
    in the shell window, which should become the editor window.
    To quit the editor, do
      ctrl-C
